@@ -34,6 +34,7 @@ class Category(object):
     def update(self, *a, **k):
         sum_score=sum([float(a.score.value) for a in self.assignments])
         sum_max=sum([float(a.max.value) for a in self.assignments])
+        self._sum_max=sum_max
         self._percent=(sum_score/sum_max)*100
         self.percent.value=str(self._percent)+"%"
         _update_class()
@@ -56,6 +57,7 @@ class Assignment(object):
         self.max=browser.html.INPUT(type="number")
         self.percent=browser.html.INPUT(readonly=True)
         self.remove=browser.html.BUTTON("X")
+        self.as_pct=browser.html.BUTTON("%")
         self.container<=browser.html.INPUT(value="Assignment")
         self.container<=":"
         self.container<=self.score
@@ -63,6 +65,7 @@ class Assignment(object):
         self.container<=self.max
         self.container<=self.percent
         self.container<=self.remove
+        self.container<=self.as_pct
         self.container<=browser.html.BR()
         self.parent=parent
         self.parent.assignments_container<=self.container
@@ -70,8 +73,12 @@ class Assignment(object):
         self.score.bind("input", self.update)
         self.max.bind("input", self.update)
         self.remove.bind("click", self.delete)
+        self.as_pct.bind("click", self.alert_as_pct)
 
         self.parent.register_assignement(self)
+
+    def alert_as_pct(self, *a, **k):
+        browser.alert("This assignement is "+str((float(self.max.value)/self.parent._sum_max)*100*float(self.parent.weight.value))+"% of your overall grade")
 
     def update(self, *a, **k):
         self.percent.value=str((float(self.score.value)/float(self.max.value))*100)+"%"
